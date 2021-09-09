@@ -1,6 +1,11 @@
 //
-// UNIT TESTING CLASS FOR SPEER API
+// UNIT TESTING FOR controllers/auth.js
+// [*] This test assumes the DB already has following 3 users (username:password):
+//      admin:admin
+//      eric:eric
+//      sarah:sarah
 //
+
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const { nanoid } = require('nanoid');
@@ -9,8 +14,7 @@ const server = require('../app.js');
 chai.should();
 chai.use(chaiHttp);
 
-describe('Speer API', () => {
-
+describe('Unit testing controllers/auth.js', () => {
   /*=================
     POST /login route
     =================*/
@@ -47,7 +51,7 @@ describe('Speer API', () => {
     });
   });
 
-  // test correct
+  // test correct credentials
   describe('POST /login', () => {
     it('It should POST a login request with correct credentials', (done) => {
       const body = {
@@ -122,4 +126,5 @@ describe('Speer API', () => {
         })
     });
   });
+
 });

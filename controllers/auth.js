@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { promisify } = require('util');
 const pool = require('./pool');
-const e = require('express');
 
 exports.login = async (req, res) => {
     // check empty field(s)
@@ -75,27 +74,27 @@ exports.register = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 8);
 
         pool.query('SELECT username FROM Users WHERE username = ?', [username], async (err, results) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).send({'message': 'Error retrieving records from database'});
-        }
-        // verify input fields
-        else if (results.length > 0) {
-          return res.status(401).send({'message': 'User already exists with the username'});
-        }
+            if (err) {
+                console.log(err);
+                return res.status(500).send({'message': 'Error retrieving records from database'});
+            }
+            // verify input fields
+            else if (results.length > 0) {
+                return res.status(401).send({'message': 'User already exists with the username'});
+            }
 
-        pool.query('INSERT INTO Users SET ?', { username: username, password: hashedPassword }, (err, results) => {
-          if (err) {
-              console.log(err);
-              return res.status(500).send({'message': 'Error registering user to database'});
-          }
-          else {
-              return res.status(200).send({'message': 'Registration success'});
-          }
+            pool.query('INSERT INTO Users SET ?', { username: username, password: hashedPassword }, (err, results) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).send({'message': 'Error registering user to database'});
+                }
+                else {
+                    return res.status(200).send({'message': 'Registration success'});
+                }
+            });
         });
-      });
     } catch (err) {
-      console.log(err);
-      res.status(500).send({'message': 'Unknown error occurred'});
+        console.log(err);
+        res.status(500).send({'message': 'Unknown error occurred'});
     }
 }
