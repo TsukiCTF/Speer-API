@@ -2,19 +2,25 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { promisify } = require('util');
 const pool = require('./pool');
+const e = require('express');
 
 exports.login = async (req, res) => {
     // check empty field(s)
     if ( !req.body.username || !req.body.password ) {
-        res.status(403).send('You must pass both username parameter and password parameter')
+        return res.status(401).send({'message': 'You must pass both username parameter and password parameter'});
     }
+    
     try {
         const { password } = req.body;
         const username = req.body.username.toLowerCase();
 
         pool.query('SELECT * FROM Users WHERE username = ?', [username], async (err, results) => {
-            if ( !results[0] || !(await bcrypt.compare(password, results[0].password)) ) {
-                return res.status(401).send('Username or password is incorrect.');
+            if (err) {
+                console.log(err);
+                return res.status(500).send({'message': 'Error retrieving records from database'});
+            }
+            else if ( !results[0] || !(await bcrypt.compare(password, results[0].password)) ) {
+                return res.status(401).send({'message': 'Username or password is incorrect'});
             }
             
             const id = results[0].id;
@@ -28,11 +34,11 @@ exports.login = async (req, res) => {
                 httpOnly: true  // disallow scripts to access cookie
             }
             res.cookie('jwt', token, cookieOptions);
-            res.status(200).send('Login successful');
+            res.status(200).send({'message': 'Login successful'});
         });
     } catch (err) {
         console.log(err);
-        res.status(500).send('Unknown error occurred');
+        res.status(500).send({'message': 'Unknown error occurred'});
     }
 }
 
@@ -60,8 +66,9 @@ exports.isLoggedIn = async (req, res, next) => {
 exports.register = async (req, res) => {
     // check empty field(s)
     if ( !req.body.username || !req.body.password ) {
-        res.status(403).send('You must pass both username parameter and password parameter')
+        return res.status(401).send({'message': 'You must pass both username parameter and password parameter'});
     }
+
     try {
         const { password } = req.body;
         const username = req.body.username.toLowerCase();
@@ -70,23 +77,25 @@ exports.register = async (req, res) => {
         pool.query('SELECT username FROM Users WHERE username = ?', [username], async (err, results) => {
         if (err) {
             console.log(err);
-            return res.status(500).send('Error retrieving records from database');
+            return res.status(500).send({'message': 'Error retrieving records from database'});
         }
         // verify input fields
         else if (results.length > 0) {
-          return res.status(403).send('User already exists with the username');
+          return res.status(401).send({'message': 'User already exists with the username'});
         }
 
         pool.query('INSERT INTO Users SET ?', { username: username, password: hashedPassword }, (err, results) => {
-          if (err)
+          if (err) {
               console.log(err);
+              return res.status(500).send({'message': 'Error registering user to database'});
+          }
           else {
-              return res.send('Registration success');
+              return res.status(200).send({'message': 'Registration success'});
           }
         });
       });
     } catch (err) {
       console.log(err);
-      res.status(500).send('Unknown error occurred');
+      res.status(500).send({'message': 'Unknown error occurred'});
     }
 }

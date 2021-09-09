@@ -17,6 +17,7 @@ app.use(cookieParser());
 app.use('/', require('./routes/api'));
 
 // start server
-const server = app.listen(process.env.PORT || 3000, () => {
-  console.log('Server listening on port ' + server.address().port);
+const port = process.env.PORT || 3000;
+module.exports = app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
 });
