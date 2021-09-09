@@ -13,10 +13,10 @@ exports.fetch = async (req, res) => {
         return res.status(403).send({'message': 'No such receiver'});
       }
 
-      const sender_id = req.user.id;
-      const receiver_id = results[0].id;
+      const senderId = req.user.id;
+      const receiverId = results[0].id;
       
-      pool.query('SELECT c.id, u.username, c.message FROM Users u INNER JOIN Chats c ON u.id = c.sender_id WHERE (c.sender_id = ? AND c.receiver_id = ?) OR (c.sender_id = ? AND c.receiver_id = ?)', [sender_id, receiver_id, receiver_id, sender_id], (err, results) => {
+      pool.query('SELECT c.id, u.username, c.message FROM Users u INNER JOIN Chats c ON u.id = c.sender_id WHERE (c.sender_id = ? AND c.receiver_id = ?) OR (c.sender_id = ? AND c.receiver_id = ?)', [senderId, receiverId, receiverId, senderId], (err, results) => {
         res.status(200).send(results);
       });
     });
@@ -39,11 +39,11 @@ exports.send = async (req, res) => {
         return res.status(403).send({'message': 'No such receiver'});
       }
 
-      const sender_id = req.user.id;
-      const receiver_id = results[0].id;
+      const senderId = req.user.id;
+      const receiverId = results[0].id;
       const message = req.body.message;
 
-      pool.query('INSERT INTO Chats (sender_id, receiver_id, message) VALUES (?, ?, ?)', [sender_id, receiver_id, message], (err, results) => {
+      pool.query('INSERT INTO Chats (sender_id, receiver_id, message) VALUES (?, ?, ?)', [senderId, receiverId, message], (err, results) => {
         if (err)
           console.log(err);
         res.status(200).send({'message': 'Message sent successfully'});
