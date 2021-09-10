@@ -6,9 +6,9 @@ const tweetController = require('../controllers/tweet');
 const router = express.Router();
 
 // auth related routes
-router.post('/register', authController.register);
-
 router.post('/login', authController.login);
+
+router.post('/register', authController.register);
 
 // private chat related routes
 router.get('/chat/:receiver', [ authController.isLoggedIn, chatController.fetch ]);

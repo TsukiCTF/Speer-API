@@ -48,7 +48,7 @@ describe('Unit testing controllers/tweet.js', () => {
   POST /tweet/:id route
   =========================*/
   // test creating new tweet post without message
-  describe('POST /tweet/:id', () => {
+  describe('POST /tweet', () => {
     it('It should login user and create a new tweet post with empty message', (done) => {
       const body = {
         username: 'admin',
@@ -81,7 +81,7 @@ describe('Unit testing controllers/tweet.js', () => {
 
   // test creating new tweet post with message
   let tweetId = null; // used later for PATCH & DELETE tests
-  describe('POST /tweet/:id', () => {
+  describe('POST /tweet', () => {
     it('It should login user and create a new tweet post with message', (done) => {
       const body = {
         username: 'admin',
@@ -148,79 +148,6 @@ describe('Unit testing controllers/tweet.js', () => {
               res.should.have.status(200);
               res.body.should.have.be.a('object');
               res.body.should.have.property('message').eql('Tweet successfully updated');
-            });
-        done();
-        })
-    });
-  });
-
-  /*=========================
-  POST /tweet/:id route
-  =========================*/
-  // test creating new tweet post without message
-  describe('POST /tweet/:id', () => {
-    it('It should login user and create a new tweet post with empty message', (done) => {
-      const body = {
-        username: 'admin',
-        password: 'admin'
-      }
-      // 1. login request
-      chai.request(server)
-        .post('/login')
-        .send(body)
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.should.be.a('object');
-          res.body.should.have.property('message').eql('Login successful');
-          res.should.have.cookie('jwt');
-
-          // 2. create tweet
-          let cookie = res.header['set-cookie'][0];
-          chai.request(server)
-            .post('/tweet')
-            .set({'Cookie': cookie})
-            .end((err, res) => {
-              res.should.have.status(403);
-              res.body.should.have.be.a('object');
-              res.body.should.have.property('message').eql('You must include tweet message');
-            });
-        done();
-        })
-    });
-  });
-
-  // test creating new tweet post with message
-  describe('POST /tweet/:id', () => {
-    it('It should login user and create a new tweet post with message', (done) => {
-      const body = {
-        username: 'admin',
-        password: 'admin'
-      }
-      // 1. login request
-      chai.request(server)
-        .post('/login')
-        .send(body)
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.should.be.a('object');
-          res.body.should.have.property('message').eql('Login successful');
-          res.should.have.cookie('jwt');
-
-          // 2. create tweet
-          let cookie = res.header['set-cookie'][0];
-          let body = {
-            message: 'hello world!'
-          }
-          chai.request(server)
-            .post('/tweet')
-            .set({'Cookie': cookie})
-            .send(body)
-            .end((err, res) => {
-              res.should.have.status(200);
-              res.body.should.have.be.a('object');
-              res.body.should.have.property('message');
-              // save the newly created tweet ID
-              tweetId = res.body.message.match(/\d+/g);
             });
         done();
         })
