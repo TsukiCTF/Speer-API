@@ -1,1 +1,6 @@
-{}
+{
+  "getUserByUsername": "SELECT * FROM Users WHERE username = ? LIMIT 1",
+  "getUserByUserID": "SELECT * FROM Users WHERE id = ? LIMIT 1",
+  "getUsernameByUsername": "SELECT username FROM Users WHERE username = ? LIMIT 1",
+  "addUser": "INSERT INTO Users SET ?"
+}

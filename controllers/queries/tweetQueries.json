@@ -1,1 +1,6 @@
-{}
+{
+  "getTweetByTweetID": "SELECT * FROM Tweets WHERE id = ? LIMIT 1",
+  "addTweet": "INSERT INTO Tweets (user_id, tweet) VALUES (?, ?)",
+  "updateTweet": "UPDATE Tweets SET tweet = ? WHERE user_id = ? AND id = ?",
+  "deleteTweet": "DELETE FROM Tweets WHERE user_id = ? AND id = ?"
+}

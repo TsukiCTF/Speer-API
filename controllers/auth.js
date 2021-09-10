@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { promisify } = require('util');
 const pool = require('./pool');
-const queries = require('./queries/authQueries.json');
+const sqlQueries = require('./queries/authQueries.json');
 
 /**
  * Authenticates user by checking credentials and setting JWT
@@ -17,7 +17,7 @@ exports.login = async (req, res) => {
     const { password } = req.body;
     const username = req.body.username.toLowerCase();
 
-    pool.query('SELECT * FROM Users WHERE username = ?', [username], async (err, results) => {
+    pool.query(sqlQueries.getUserByUsername, [username], async (err, results) => {
       if (err) {
         console.log(err);
         return res.status(500).send({'message': 'Error retrieving records from database'});
@@ -56,7 +56,7 @@ exports.isLoggedIn = async (req, res, next) => {
     try {
     // verify the token
     const decodedJWT = await promisify(jwt.verify)(req.cookies.jwt, process.env.JWT_SECRET);
-    pool.query('SELECT * FROM Users WHERE id = ?', [decodedJWT.id], (err, results) => {
+    pool.query(sqlQueries.getUserByUserID, [decodedJWT.id], (err, results) => {
       // verify that user exists
       if (!results[0]) {
         return next();
@@ -89,7 +89,7 @@ exports.register = async (req, res) => {
     const username = req.body.username.toLowerCase();
     const hashedPassword = await bcrypt.hash(password, 8);
 
-    pool.query('SELECT username FROM Users WHERE username = ?', [username], async (err, results) => {
+    pool.query(sqlQueries.getUsernameByUsername, [username], async (err, results) => {
       if (err) {
         console.log(err);
         return res.status(500).send({'message': 'Error retrieving records from database'});

@@ -1,1 +1,5 @@
-{}
+{
+  "getUserIDByUsername": "SELECT id FROM Users WHERE username = ? LIMIT 1",
+  "getChats": "SELECT c.id, u.username, c.message FROM Users u INNER JOIN Chats c ON u.id = c.sender_id WHERE (c.sender_id = ? AND c.receiver_id = ?) OR (c.sender_id = ? AND c.receiver_id = ?)",
+  "addChat": "INSERT INTO Chats (sender_id, receiver_id, message) VALUES (?, ?, ?)"
+}

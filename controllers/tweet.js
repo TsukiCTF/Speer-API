@@ -1,5 +1,5 @@
 const pool = require('./pool');
-const queries = require('./queries/tweetQueries.json');
+const sqlQueries = require('./queries/tweetQueries.json');
 
 /**
  * Retrives a tweet post by ID
@@ -12,7 +12,7 @@ exports.getTweet = async (req, res) => {
 
   try {
     const tweetId = req.params.id;
-    pool.query('SELECT * FROM Tweets WHERE id = ? LIMIT 1', [tweetId], (err, results) => {
+    pool.query(sqlQueries.getTweetByTweetID, [tweetId], (err, results) => {
       // verify tweet exists
       if (!results[0]) {
         return res.status(403).send({'message': 'No such tweet ID'});
@@ -41,7 +41,7 @@ exports.postTweet = async (req, res) => {
     const userId = req.user.id;
     const message = req.body.message;
     // insert a new tweet record into database
-    pool.query('INSERT INTO Tweets (user_id, tweet) VALUES (?, ?)', [userId, message], (err, results) => {
+    pool.query(sqlQueries.addTweet, [userId, message], (err, results) => {
       if (err) {
         console.log(err);
       }
@@ -79,7 +79,7 @@ exports.updateTweet = async (req, res) => {
     const tweetId = req.params.id;
     const message = req.body.message;
     // update tweet record
-    pool.query('UPDATE Tweets SET tweet = ? WHERE user_id = ? AND id = ?', [message, userId, tweetId], (err, results) => {
+    pool.query(sqlQueries.updateTweet, [message, userId, tweetId], (err, results) => {
       if (err) {
         console.log(err);
       }
@@ -111,7 +111,7 @@ exports.deleteTweet = async (req, res) => {
     const userId = req.user.id;
     const tweetId = req.params.id;
     // delete tweet record
-    pool.query('DELETE FROM Tweets WHERE user_id = ? AND id = ?', [userId, tweetId], (err, results) => {
+    pool.query(sqlQueries.deleteTweet, [userId, tweetId], (err, results) => {
       if (err) {
         console.log(err);
       }
