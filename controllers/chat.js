@@ -1,44 +1,62 @@
 const pool = require('./pool');
+const queries = require('./queries/chatQueries.json');
 
+/**
+ * Retrieves all private chat messages between two users
+ */
 exports.fetch = async (req, res) => {
+  // verify user input
   if (!req.user) {
-    res.status(403).send({'message': 'You must be logged in'});
+    return res.status(403).send({'message': 'You must be logged in'});
   }
   else if (!req.params.receiver) {
-    res.status(403).send({'message': 'You must provide the receiver'});
+    return res.status(403).send({'message': 'You must provide the receiver'});
   }
-  else {
+
+  try {
     pool.query('SELECT id FROM Users WHERE username = ? LIMIT 1', [req.params.receiver], (err, results) => {
+      // verify receiver exists
       if (!results[0]) {
         return res.status(403).send({'message': 'No such receiver'});
       }
 
+      // retrieve all chat messages associated with receiver
       const senderId = req.user.id;
       const receiverId = results[0].id;
-      
+
       pool.query('SELECT c.id, u.username, c.message FROM Users u INNER JOIN Chats c ON u.id = c.sender_id WHERE (c.sender_id = ? AND c.receiver_id = ?) OR (c.sender_id = ? AND c.receiver_id = ?)', [senderId, receiverId, receiverId, senderId], (err, results) => {
         res.status(200).send(results);
       });
     });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({'message': 'Unknown error occurred'});
   }
 }
 
+/**
+ * Sends a private chat message to another user
+ */
 exports.send = async (req, res) => {
+  // verify user input
   if (!req.user) {
-    res.status(403).send({'message': 'You must be logged in'});
+    return res.status(403).send({'message': 'You must be logged in'});
   }
   else if (!req.params.receiver) {
-    res.status(403).send({'message': 'You must provide the receiver'});
+    return res.status(403).send({'message': 'You must provide the receiver'});
   }
   else if (!req.body.message) {
-    res.status(403).send({'message': 'You must include chat message'});
+    return res.status(403).send({'message': 'You must include chat message'});
   }
-  else {
+  
+  try {
     pool.query('SELECT id FROM Users WHERE username = ? LIMIT 1', [req.params.receiver], (err, results) => {
+      // verify receiver exists
       if (!results[0]) {
         return res.status(403).send({'message': 'No such receiver'});
       }
 
+      // insert a new chat message record into database
       const senderId = req.user.id;
       const receiverId = results[0].id;
       const message = req.body.message;
@@ -49,5 +67,8 @@ exports.send = async (req, res) => {
         res.status(200).send({'message': 'Message sent successfully'});
       });
     });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({'message': 'Unknown error occurred'});
   }
 }
