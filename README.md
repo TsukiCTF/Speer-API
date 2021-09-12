@@ -38,14 +38,6 @@ Deletes an existing tweet:
 DELETE /tweet/{tweet_id}
 ```
 
-## Unit Testing
-Unit testing is available with [Mocha](https://mochajs.org/) framework.
-Simply run following line on console:
-```bash
-npm test
-```
-![image](https://user-images.githubusercontent.com/32463233/132783975-9eb7f3e0-75f3-45d0-aa96-7d41dccef0ac.png)
-
 ## Setting Up Database
 This project depends on external MySQL server running. After configuring ``.env`` file at the root of this project hierarchy and creating a new user in MySQL server, run the following queries in MySQL console to create necessary data:
 ```SQL
@@ -77,3 +69,20 @@ CREATE TABLE Tweets (
         FOREIGN KEY (user_id) REFERENCES Users(id)
 );
 ```
+
+## Unit Testing
+**Test assumes the DB already has following 3 users (username:password):**
+- admin:admin
+- eric:eric
+- sarah:sarah
+
+**Test assumes the DB already has a tweet (with id 5) in Tweets table.**
+
+**Make sure to add these entries to the correct tables prior to unit testing!**
+
+Unit testing is available with [Mocha](https://mochajs.org/) framework.
+Simply run following line on console:
+```bash
+npm test
+```
+![image](https://user-images.githubusercontent.com/32463233/132783975-9eb7f3e0-75f3-45d0-aa96-7d41dccef0ac.png)
